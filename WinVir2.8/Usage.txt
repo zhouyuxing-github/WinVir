@@ -1,0 +1,17 @@
+#######################       Hey~~ Attention       ##########################
+The path of winVir must be in english with no space and illegal characters ! 
+Such as "/d/bio_software/winVir" is correct; "/d/bio  software/winVir" is incorrect!!
+#####################################################################
+Please be note that you have to download Gitbash first to provide the necessary environment.
+Download  Gitbash ==> (https://git-scm.com/downloads)
+
+Usage:
+1. START a Gitbash command window. 
+2. DRAG "WinVir.bash" script into Gitbash command window, type " -i ", drag metavirome rawdata (fastq.gz format) into the command window, then press enter to run.
+
+for example:
+/c/Users/DELL/Desktop/winVir/reads_blast.bash  -i  /d/test/F15_FDME21019_1.fq.gz
+(If the data is pair-ended, only one need to be analyzed. When the cursor is on the bottom left of the window, the program is running...)
+
+
+If you want to update or make a database by yourself, please remove everything in the "databases" folder, then put your new fasta (with gene ID) dataset in.
