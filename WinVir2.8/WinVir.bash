@@ -70,12 +70,12 @@ if [ ! -d $dirname/${basename%.*}_res ];then
     awk '{if (!keys[$1]) print $0; keys[$1] = 1;}'  ${inFile%.*}_blastResSorted.xls > ${inFile%.*}_blastResSortedUniq.xls && \
     perl $bin/programs/reads_blast_Add_idName.pl   $bin/databases/db_idName   ${inFile%.*}_blastResSortedUniq.xls > ${inFile%.*}_blastResSortedUniqAddidName.xls && \
     rm ${inFile%.*}_blastRes.xls ${inFile%.*}_blastResSorted.xls && \
-    awk '{sum[$2]+=1}END{for(i in sum)print i"\t"sum[i]}'   ${inFile%.*}_blastResSortedUniq.xls | awk '/gi/{print}' |sort -nrk 2 >  ${inFile%.*}_readsStat.xls && \
+    awk '{sum[$2]+=1}END{for(i in sum)print i"\t"sum[i]}'   ${inFile%.*}_blastResSortedUniq.xls | awk '/gi/||/gb/ {print}' |sort -nrk 2 >  ${inFile%.*}_readsStat.xls && \
     perl $bin/programs/reads_blast_Add_idName.pl   $bin/databases/db_idName   ${inFile%.*}_readsStat.xls > ${inFile%.*}_readsStatAddidName.xls && \
     rm ${inFile%.*}_readsStat.xls && \
     echo "Species table was generated at `date`!" && \
 
-    awk 'NR==FNR{a[$1]=$0;next}{if ($2 in a) print  $0 "\t" a[$2]}'  ${inFile%.*}_readsStatAddidName.xls  ${inFile%.*}_blastResSortedUniq.xls |tr -s ',][/\ '  '_' | sort -rk 14   > ${inFile%.*}_eachReadDetail.xls
+    awk 'NR==FNR{a[$1]=$0;next}{if ($2 in a) print  $0 "\t" a[$2]}'  ${inFile%.*}_readsStatAddidName.xls  ${inFile%.*}_blastResSortedUniq.xls |tr -s ',\ '  '_' | sort -rk 14   > ${inFile%.*}_eachReadDetail.xls
     echo "Start extracting fasta from each_read_detail..." && \
     sed -i '1i\SWUN_ZYX'  ${inFile%.*}_eachReadDetail.xls && \
     perl $bin/programs/fromContigsNameGetFasta.pl   ${inFile%.*}_eachReadDetail.xls   ${inFile}.fasta > ${inFile}_matched.fa && \
