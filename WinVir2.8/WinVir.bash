@@ -28,7 +28,6 @@ fi
 if [ "$cutOff" = "" ];
 then
 	$cutOff=80
-	echo "The cutOff alignment length was set to 80 as default"
 fi
 if [ "$flag" = 1 ];
 then
@@ -36,10 +35,18 @@ then
 	exit
 fi
 
-###############          get bin and base          #################
+##############         get bin, base  and check       ################
 bin="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )" && \
 dirname="$( cd "$( dirname "$inFile" )" && pwd )" && \
 basename=`basename  ${inFile%.*}` && \
+
+STR='GNU/Linux is an operating system'
+SUB=' '
+if [[ "$bin" == *"$SUB"* ]]; then
+  echo -e "\n\nWinVir:\n       The path to store the program must be in English with no blank space and illegal characters!"
+  echo  -e "       such as \"/d/bio soft/WinVir2.0/\" is incorrect; \"/d/bio_soft/WinVir2.0/\" is correct."
+  exit
+fi
 ################################################
 
 #############    check the existence of the database     #############
@@ -63,7 +70,7 @@ if [ ! -d $dirname/${basename%.*}_res ];then
     echo "WinVir start at `date`" && \
     echo "Start converting fastq to fasta..." && \
     zcat  $inFile | awk '{getline seq;getline plus;getline qual;sub("@",">",$0); if (seq !~ /NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN/) print $0 "\n"seq}' | tr -s ' ' '_'> $dirname/${basename%.*}_res/${basename%.*}.fasta && \
-    echo "Start reads_blast..." && \
+    echo -e "It takes about 1.2h to process a 2Gb fastq.gz on personal computers, please wait...\nStart reads_blast..." && \
     time $bin/programs/blast-2.11.0+/bin/blastn.exe  -num_threads 4 -outfmt 7 -db $bin/databases/db -query $dirname/${basename%.*}_res/${basename%.*}.fasta  -out $dirname/${basename%.*}_res/${basename%.*}_blastRes.xls
     echo "Start sorting by bit score..." && \
     sort -nrk 12 $dirname/${basename%.*}_res/${basename%.*}_blastRes.xls | awk '$4>80{print $0}' > $dirname/${basename%.*}_res/${basename%.*}_blastResSorted.xls && \
@@ -120,7 +127,7 @@ if [ ! -d $dirname/${basename%.*}_res ];then
 	
     rm  $dirname/${basename%.*}_res/${basename%.*}_readsStatAddidName.xls  $dirname/${basename%.*}_res/${basename%.*}_blastResSortedUniq.xls $dirname/${basename%.*}_res/${basename%.*}_eachReadDetail.xls  $dirname/${basename%.*}_res/${basename%.*}_matched.fa $dirname/${basename%.*}_res/${basename%.*}_blastResSortedUniqAddidName.xls   $dirname/${basename%.*}_res/fasta_datasets/STDEVP.fas   $dirname/${basename%.*}_res/fasta_datasets/*xls && \
 	#mv  $dirname/${basename%.*}_res/${basename%.*}_result.xls  $dirname/${basename%.*}_res/${basename%.*}_result.xls 
-    echo -e "\n\nwinVir:\n       Conguratulation! Reads corresponding to each species were extracted, you can assemble them using SeqMan...\n       Low \"MeanQueryCover\" and \"St_Dev_of_Reads_Location\" suggests the result might be a false possitive...\n       All done at `date`, Bye Bye~"
+    echo -e "\n\nwinVir:\n       Conguratulation! Reads corresponding to each species were extracted, you can assemble them using SeqMan...\n       Low \"MeanQueryCover\" and \"St_Dev_of_Reads_Location\" suggests the result might be a false possitive...\n\n       Result files were generated in \"$dirname/${basename%.*}_res\"\n       All done at `date`, Bye Bye~"
 
 else
     rm $dirname/${basename%.*}_res/${basename%.*}_matched.fa  $dirname/${basename%.*}_res/${basename%.*}_readsStatAddidName.xls  $dirname/${basename%.*}_res/${basename%.*}_eachReadDetail.xls  $dirname/${basename%.*}_res/${basename%.*}_blastResSortedUniq.xls  $dirname/${basename%.*}_res/${basename%.*}_blastResSortedUniqAddidName.xls 
